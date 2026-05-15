@@ -1,0 +1,13 @@
+Options -Indexes
+Options -MultiViews
+
+RewriteEngine On
+
+# Deny access to sensitive files
+RewriteRule ^\.env - [F,L]
+RewriteRule ^composer\.(json|lock) - [F,L]
+
+# Route all requests through index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
