@@ -10,7 +10,7 @@
         <div class="col-lg-8">
             <div class="card shadow">
                 <div class="card-body">
-                    <form action="<?= Env::get('APP_URL') ?>/admin/cars/<?= $car['id'] ?>/update" method="POST">
+                    <form action="<?= Env::get('APP_URL') ?>/admin/cars/<?= $car['id'] ?>/update" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="_csrf_token" value="<?= htmlspecialchars($this->generateCsrf()) ?>">
 
                         <div class="row">
@@ -83,6 +83,21 @@
                         <div class="mb-3">
                             <label class="form-label">Description</label>
                             <textarea name="description" class="form-control" rows="3"><?= htmlspecialchars($car['description'] ?? '') ?></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Car Photo</label>
+                            <input type="file" name="photo" class="form-control" accept="image/*">
+
+                            <?php if (!empty($car['photo'])): ?>
+                                <div class="mt-3">
+                                    <p class="mb-2">Current Photo:</p>
+                                    <img src="<?= Env::get('APP_URL') ?>/<?= htmlspecialchars($car['photo']) ?>"
+                                         width="180"
+                                         class="rounded shadow"
+                                         style="object-fit: cover;">
+                                </div>
+                            <?php endif; ?>
                         </div>
 
                         <div class="d-flex gap-2">

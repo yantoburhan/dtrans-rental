@@ -71,6 +71,8 @@ class AuthController extends Controller
             'avatar'   => $user['avatar'] ?? null,
         ]);
 
+        $this->flash('success', 'Login successful. Welcome!');
+
         $this->redirectByRole($user['role']);
     }
 
@@ -232,7 +234,7 @@ class AuthController extends Controller
     public function logout(): void
     {
         Session::destroy();
-        $this->redirect('auth/login');
+        $this->redirect('');
     }
 
     // ----------------------------------------------------------------

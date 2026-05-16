@@ -10,7 +10,7 @@
         <div class="col-lg-8">
             <div class="card shadow">
                 <div class="card-body">
-                    <form action="<?= Env::get('APP_URL') ?>/admin/cars/store" method="POST">
+                    <form action="<?= Env::get('APP_URL') ?>/admin/cars/store" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="_csrf_token" value="<?= htmlspecialchars($this->generateCsrf()) ?>">
 
                         <div class="row">
@@ -83,6 +83,11 @@
                         <div class="mb-3">
                             <label class="form-label">Description</label>
                             <textarea name="description" class="form-control" rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Car Image</label>
+                            <input type="file" name="photo" class="form-control" accept="image/*">
                         </div>
 
                         <div class="d-flex gap-2">
