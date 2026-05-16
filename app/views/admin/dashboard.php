@@ -204,3 +204,54 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+
+<?php $alert = Session::getFlash('alert'); ?>
+<?php if ($alert): ?>
+    <div class="floating-alert alert alert-<?= htmlspecialchars($alert['type']) ?> alert-dismissible fade show" role="alert">
+        <?= htmlspecialchars($alert['message']) ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<?php endif; ?>
+
+<style>
+.floating-alert {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    min-width: 320px;
+    max-width: 420px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    border-radius: 12px;
+    animation: slideDownFade 0.5s ease;
+}
+
+@keyframes slideDownFade {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const alertBox = document.querySelector('.floating-alert');
+    if (alertBox) {
+        setTimeout(() => {
+            alertBox.style.transition = 'all 0.5s ease';
+            alertBox.style.opacity = '0';
+            alertBox.style.transform = 'translateX(-50%) translateY(-40px)';
+
+            setTimeout(() => {
+                alertBox.remove();
+            }, 500);
+        }, 3000);
+    }
+});
+</script>

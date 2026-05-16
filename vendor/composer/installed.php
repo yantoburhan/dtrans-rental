@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'dtrans/rental',
-        'pretty_version' => '1.0.0+no-version-set',
-        'version' => '1.0.0.0',
-        'reference' => null,
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
+        'reference' => '9610c6a0ff6eed9a6e39a459f70ecc56c47af02b',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -38,9 +38,9 @@
             'dev_requirement' => false,
         ),
         'dtrans/rental' => array(
-            'pretty_version' => '1.0.0+no-version-set',
-            'version' => '1.0.0.0',
-            'reference' => null,
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
+            'reference' => '9610c6a0ff6eed9a6e39a459f70ecc56c47af02b',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
