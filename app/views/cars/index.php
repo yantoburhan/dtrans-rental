@@ -63,7 +63,7 @@
                 <label class="form-label text-muted small fw-medium font-secondary">Tanggal Ambil</label>
                 <div class="input-premium-icon">
                     <i class="bi bi-calendar-check input-icon-left text-primary"></i>
-                    <input type="date" name="pickup_date" class="form-control-premium font-secondary" value="<?= htmlspecialchars($filters['pickup_date'] ?? '') ?>">
+                    <input type="date" name="pickup_date" class="form-control-premium font-secondary" value="<?= htmlspecialchars($filters['pickup_date'] ?? '') ?>" min="<?= date('Y-m-d') ?>">
                 </div>
             </div>
 
@@ -71,7 +71,7 @@
                 <label class="form-label text-muted small fw-medium font-secondary">Tanggal Kembali</label>
                 <div class="input-premium-icon">
                     <i class="bi bi-calendar-x input-icon-left text-danger"></i>
-                    <input type="date" name="return_date" class="form-control-premium font-secondary" value="<?= htmlspecialchars($filters['return_date'] ?? '') ?>">
+                    <input type="date" name="return_date" class="form-control-premium font-secondary" value="<?= htmlspecialchars($filters['return_date'] ?? '') ?>" min="<?= date('Y-m-d', strtotime('+1 day')) ?>">
                 </div>
             </div>
 

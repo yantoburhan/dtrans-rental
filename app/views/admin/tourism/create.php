@@ -10,7 +10,7 @@
         <div class="col-lg-8">
             <div class="card shadow">
                 <div class="card-body">
-                    <form action="<?= Env::get('APP_URL') ?>/admin/tourism/store" method="POST">
+                    <form action="<?= Env::get('APP_URL') ?>/admin/tourism/store" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="_csrf_token" value="<?= htmlspecialchars($this->generateCsrf()) ?>">
 
                         <div class="mb-3">
@@ -41,6 +41,20 @@
                         <div class="mb-3">
                             <label class="form-label">Description</label>
                             <textarea name="description" class="form-control" rows="4"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Destination Photos</label>
+
+                            <input type="file"
+                                name="photos[]"
+                                class="form-control"
+                                accept="image/*"
+                                multiple>
+
+                            <small class="text-muted">
+                                You can upload multiple images (jpg, png, webp).
+                            </small>
                         </div>
 
                         <div class="d-flex gap-2">

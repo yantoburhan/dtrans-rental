@@ -47,17 +47,125 @@
                         <p class="text-muted fs-8 mb-0">Riwayat transaksi dan pembaruan akun Anda</p>
                     </div>
                 </div>
-                <div class="card-body p-4 d-flex flex-column justify-content-center align-items-center py-5">
-                    <div class="text-center py-4">
+                <div class="card-body p-0">
+
+                <?php if (empty($recentActivities)): ?>
+
+                    <div class="p-5 text-center">
                         <div class="empty-state-icon mb-3 text-muted opacity-30">
                             <i class="bi bi-journal-x display-4"></i>
                         </div>
-                        <h6 class="fw-semibold text-dark-clean mb-1">Belum Ada Aktivitas</h6>
+
+                        <h6 class="fw-semibold text-dark-clean mb-1">
+                            Belum Ada Aktivitas
+                        </h6>
+
                         <p class="text-muted small max-w-xs mx-auto mb-0">
-                            Semua riwayat pemesanan atau perubahan akun Anda akan muncul di sini secara *real-time*.
+                            Semua riwayat pemesanan atau perubahan akun Anda akan muncul di sini secara realtime.
                         </p>
                     </div>
-                </div>
+
+                <?php else: ?>
+
+                    <div class="activity-timeline">
+
+                        <?php foreach ($recentActivities as $activity): ?>
+
+                            <?php
+                                $status = $activity['status'];
+
+                                $badgeClass = 'secondary';
+                                $icon = 'bi-clock-history';
+
+                                switch ($status) {
+                                    case 'pending':
+                                        $badgeClass = 'warning';
+                                        $icon = 'bi-hourglass-split';
+                                        break;
+
+                                    case 'approved':
+                                        $badgeClass = 'primary';
+                                        $icon = 'bi-check-circle-fill';
+                                        break;
+
+                                    case 'ongoing':
+                                        $badgeClass = 'info';
+                                        $icon = 'bi-car-front-fill';
+                                        break;
+
+                                    case 'completed':
+                                        $badgeClass = 'success';
+                                        $icon = 'bi-patch-check-fill';
+                                        break;
+
+                                    case 'cancelled':
+                                        $badgeClass = 'danger';
+                                        $icon = 'bi-x-circle-fill';
+                                        break;
+                                }
+                            ?>
+
+                            <div class="activity-item">
+                                <div class="activity-icon bg-<?= $badgeClass ?>">
+                                    <i class="bi <?= $icon ?>"></i>
+                                </div>
+
+                                <div class="activity-content">
+
+                                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+
+                                        <div>
+                                            <h6 class="fw-bold mb-1 text-dark-clean">
+                                                <?= htmlspecialchars($activity['brand'] . ' ' . $activity['model']) ?>
+                                            </h6>
+
+                                            <div class="small text-muted mb-2">
+                                                Booking Code:
+                                                <strong><?= htmlspecialchars($activity['booking_code']) ?></strong>
+                                            </div>
+
+                                            <div class="d-flex flex-wrap gap-2">
+
+                                                <span class="badge rounded-pill bg-light text-dark border">
+                                                    <?= ucfirst($status) ?>
+                                                </span>
+
+                                                <span class="badge rounded-pill bg-light text-dark border">
+                                                    <?= date('d M Y', strtotime($activity['pickup_date'])) ?>
+                                                </span>
+
+                                                <?php if (!empty($activity['driver_name'])): ?>
+                                                    <span class="badge rounded-pill bg-light text-dark border">
+                                                        Driver:
+                                                        <?= htmlspecialchars($activity['driver_name']) ?>
+                                                    </span>
+                                                <?php endif; ?>
+
+                                            </div>
+                                        </div>
+
+                                        <div class="text-end">
+                                            <div class="fw-bold text-primary">
+                                                IDR <?= number_format($activity['total_price'], 0, ',', '.') ?>
+                                            </div>
+
+                                            <div class="small text-muted">
+                                                <?= $this->timeAgo($activity['created_at']) ?>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        <?php endforeach; ?>
+
+                    </div>
+
+                <?php endif; ?>
+
+            </div>
             </div>
         </div>
 
@@ -250,6 +358,64 @@
         font-size: 0.85rem; transition: color 0.2s;
     }
     .btn-close-dash:hover { color: var(--text-headline); }
+
+    /* Activity Timeline */
+    .activity-timeline {
+        padding: 10px 0;
+    }
+
+    .activity-item {
+        position: relative;
+        display: flex;
+        gap: 16px;
+        padding: 24px;
+        transition: background 0.25s ease;
+    }
+
+    .activity-item:not(:last-child) {
+        border-bottom: 1px solid rgba(226, 232, 240, 0.7);
+    }
+
+    .activity-item:hover {
+        background: rgba(248, 250, 252, 0.8);
+    }
+
+    .activity-icon {
+        width: 48px;
+        height: 48px;
+        min-width: 48px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1rem;
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+    }
+
+    .activity-content {
+        flex: 1;
+    }
+
+    .bg-warning {
+        background: #F59E0B !important;
+    }
+
+    .bg-primary {
+        background: #4F46E5 !important;
+    }
+
+    .bg-success {
+        background: #10B981 !important;
+    }
+
+    .bg-danger {
+        background: #EF4444 !important;
+    }
+
+    .bg-info {
+        background: #0EA5E9 !important;
+    }
 
     /* Advanced Fluid Scroll Animations */
     .animate { opacity: 0; will-change: transform, opacity; }

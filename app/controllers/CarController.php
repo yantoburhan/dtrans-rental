@@ -9,12 +9,24 @@ class CarController extends Controller
     {
         $carModel = new Car();
 
+        $today = new DateTime('now', new DateTimeZone('Asia/Jakarta'));
+        $tomorrow = (clone $today)->modify('+1 day');
+
         $filters = [
             'category'     => $this->input('category', ''),
             'transmission' => $this->input('transmission', ''),
             'capacity'     => $this->input('capacity', ''),
-            'pickup_date'  => $this->input('pickup_date', ''),
-            'return_date'  => $this->input('return_date', ''),
+
+            // Default otomatis hari ini & besok
+            'pickup_date'  => $this->input(
+                'pickup_date',
+                $today->format('Y-m-d')
+            ),
+
+            'return_date'  => $this->input(
+                'return_date',
+                $tomorrow->format('Y-m-d')
+            ),
         ];
 
         $cars = $carModel->getAvailableCars(array_filter($filters));

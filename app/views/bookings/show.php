@@ -170,5 +170,182 @@
             </div>
         </div>
 
+        <?php
+        $canReview =
+            $booking['status'] === 'completed' &&
+            !empty($booking['driver_id']);
+        ?>
+
+        <?php if ($canReview): ?>
+
+        <div class="row mt-4">
+            <div class="col-lg-12">
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4">
+
+                        <h5 class="mb-4 fw-bold">
+                            <i class="bi bi-star-fill text-warning me-2"></i>
+                            Driver Review
+                        </h5>
+
+                        <?php if (!empty($review)): ?>
+
+                            <!-- SHOW REVIEW -->
+
+                            <div class="border rounded-4 p-4 bg-light">
+
+                                <div class="d-flex align-items-center mb-3">
+
+                                    <div class="me-3">
+                                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
+                                            style="width:60px;height:60px;font-size:1.2rem;font-weight:700;">
+                                            <?= strtoupper(substr($booking['driver_name'], 0, 1)) ?>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <h6 class="mb-1 fw-bold">
+                                            <?= htmlspecialchars($booking['driver_name']) ?>
+                                        </h6>
+
+                                        <div class="text-warning fs-5">
+                                            <?php for($i = 1; $i <= 5; $i++): ?>
+                                                <?php if($i <= $review['rating']): ?>
+                                                    <i class="bi bi-star-fill"></i>
+                                                <?php else: ?>
+                                                    <i class="bi bi-star"></i>
+                                                <?php endif; ?>
+                                            <?php endfor; ?>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <?php if (!empty($review['comment'])): ?>
+                                    <p class="mb-2 text-muted">
+                                        <?= nl2br(htmlspecialchars($review['comment'])) ?>
+                                    </p>
+                                <?php endif; ?>
+
+                                <small class="text-muted">
+                                    Reviewed on
+                                    <?= date('d M Y H:i', strtotime($review['created_at'])) ?>
+                                </small>
+
+                            </div>
+
+                        <?php else: ?>
+
+                            <!-- REVIEW FORM -->
+
+                            <form method="POST"
+                                action="<?= Env::get('APP_URL') ?>/customer/bookings/<?= $booking['id'] ?>/review">
+
+                                <input type="hidden"
+                                    name="_csrf_token"
+                                    value="<?= $csrf ?>">
+
+                                <div class="mb-4">
+
+                                    <label class="form-label fw-semibold">
+                                        How was your experience with
+                                        <?= htmlspecialchars($booking['driver_name']) ?>?
+                                    </label>
+
+                                    <div class="rating-stars d-flex gap-2 fs-2">
+
+                                        <?php for($i = 1; $i <= 5; $i++): ?>
+                                            <i class="bi bi-star star-item"
+                                            data-value="<?= $i ?>"></i>
+                                        <?php endfor; ?>
+
+                                    </div>
+
+                                    <input type="hidden"
+                                        name="rating"
+                                        id="ratingInput"
+                                        required>
+
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label fw-semibold">
+                                        Comment
+                                    </label>
+
+                                    <textarea
+                                        name="comment"
+                                        rows="4"
+                                        class="form-control"
+                                        placeholder="Share your experience with this driver..."></textarea>
+                                </div>
+
+                                <button type="submit"
+                                        class="btn btn-primary px-4 rounded-pill">
+                                    Submit Review
+                                </button>
+
+                            </form>
+
+                        <?php endif; ?>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <?php endif; ?>
+
     </div>
 </div>
+
+<style>
+.rating-stars .star-item{
+    cursor:pointer;
+    color:#D1D5DB;
+    transition:0.2s;
+}
+
+.rating-stars .star-item.active{
+    color:#F59E0B;
+}
+
+.rating-stars .star-item:hover{
+    transform:scale(1.1);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+
+    const stars = document.querySelectorAll('.star-item');
+    const ratingInput = document.getElementById('ratingInput');
+
+    stars.forEach((star, index) => {
+
+        star.addEventListener('click', function(){
+
+            const rating = index + 1;
+
+            ratingInput.value = rating;
+
+            stars.forEach((s, i) => {
+
+                if(i < rating){
+                    s.classList.remove('bi-star');
+                    s.classList.add('bi-star-fill', 'active');
+                }else{
+                    s.classList.remove('bi-star-fill', 'active');
+                    s.classList.add('bi-star');
+                }
+
+            });
+
+        });
+
+    });
+
+});
+</script>

@@ -28,4 +28,20 @@ class TourismDestination extends Model
 
         return $dest;
     }
+
+    public function addPhoto(
+        int $destinationId,
+        string $photoPath,
+        int $sortOrder = 0
+    ): bool {
+        return $this->db()->prepare(
+            "INSERT INTO tourism_photos
+            (destination_id, photo_path, sort_order)
+            VALUES (?, ?, ?)"
+        )->execute([
+            $destinationId,
+            $photoPath,
+            $sortOrder
+        ]);
+    }
 }

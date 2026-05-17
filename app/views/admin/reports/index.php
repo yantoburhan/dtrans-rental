@@ -83,8 +83,12 @@
 </div>
 
 <script>
+document.addEventListener('DOMContentLoaded', function () {
+
     const revenueCtx = document.getElementById('revenueChart');
+
     if (revenueCtx) {
+
         new Chart(revenueCtx, {
             type: 'line',
             data: {
@@ -102,17 +106,24 @@
             options: {
                 responsive: true,
                 plugins: {
-                    legend: { display: false }
+                    legend: {
+                        display: false
+                    }
                 },
                 scales: {
                     y: {
                         beginAtZero: true,
                         ticks: {
-                            callback: (value) => 'IDR ' + value.toLocaleString('id-ID')
+                            callback: function(value) {
+                                return 'IDR ' + value.toLocaleString('id-ID');
+                            }
                         }
                     }
                 }
             }
         });
+
     }
+
+});
 </script>

@@ -99,13 +99,23 @@ class Car extends Model
     public function getMostRented(int $limit = 5): array
     {
         return $this->query(
-            "SELECT c.id, c.brand, c.model, c.category, COUNT(b.id) AS total_bookings
-             FROM {$this->table} c
-             LEFT JOIN bookings b ON b.car_id = c.id AND b.status = 'completed'
-             GROUP BY c.id
-             ORDER BY total_bookings DESC
-             LIMIT ?",
-            [$limit]
+            "SELECT
+                c.id,
+                c.brand,
+                c.model,
+                COUNT(b.id) AS rentals
+
+            FROM {$this->table} c
+
+            LEFT JOIN bookings b
+                ON b.car_id = c.id
+                AND b.status IN ('approved','ongoing','completed')
+
+            GROUP BY c.id
+
+            ORDER BY rentals DESC
+
+            LIMIT {$limit}"
         );
     }
 

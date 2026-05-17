@@ -43,6 +43,23 @@
                             <textarea name="description" class="form-control" rows="4"><?= htmlspecialchars($destination['description'] ?? '') ?></textarea>
                         </div>
 
+                        <?php if (!empty($destination['photos'])): ?>
+
+                        <div class="row g-3 mb-4">
+
+                            <?php foreach ($destination['photos'] as $photo): ?>
+
+                                <div class="col-md-3">
+                                    <img src="<?= Env::get('APP_URL') ?>/<?= htmlspecialchars($photo['photo_path']) ?>"
+                                        class="img-fluid rounded shadow-sm">
+                                </div>
+
+                            <?php endforeach; ?>
+
+                        </div>
+
+                        <?php endif; ?>
+
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary">Update Destination</button>
                             <a href="<?= Env::get('APP_URL') ?>/admin/tourism" class="btn btn-secondary">Cancel</a>

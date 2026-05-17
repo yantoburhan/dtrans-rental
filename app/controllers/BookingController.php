@@ -5,6 +5,7 @@
  */
 class BookingController extends Controller
 {
+    private DriverReview $driverReviewModel;
     private Booking $bookingModel;
     private Car $carModel;
     private Driver $driverModel;
@@ -14,6 +15,7 @@ class BookingController extends Controller
         $this->bookingModel = new Booking();
         $this->carModel     = new Car();
         $this->driverModel  = new Driver();
+        $this->driverReviewModel = new DriverReview();
     }
 
     // ----------------------------------------------------------------
@@ -59,8 +61,13 @@ class BookingController extends Controller
             return;
         }
 
+        $review = $this->driverReviewModel
+            ->getByBooking((int)$id);
+
         $this->view('bookings.show', [
-            'booking' => $booking
+            'booking' => $booking,
+            'review'  => $review,
+            'csrf'    => $this->generateCsrf(),
         ]);
     }
 
@@ -270,5 +277,110 @@ class BookingController extends Controller
         );
 
         $this->redirect('customer/bookings');
+    }
+
+    // ----------------------------------------------------------------
+    // Submit Driver Review
+    // ----------------------------------------------------------------
+
+    public function submitReview(string $bookingId): void
+    {
+        $this->verifyCsrf();
+
+        $user = Session::get('user');
+
+        if (!$user) {
+            $this->flash('danger', 'Please login first.');
+            $this->redirect('login');
+            return;
+        }
+
+        $booking = $this->bookingModel
+            ->getFullDetail((int)$bookingId);
+
+        if (!$booking) {
+            $this->flash('danger', 'Booking not found.');
+            $this->redirect('customer/bookings');
+            return;
+        }
+
+        // =========================================================
+        // Security validation
+        // =========================================================
+
+        if ((int)$booking['user_id'] !== (int)$user['id']) {
+            $this->flash('danger', 'Unauthorized access.');
+            $this->redirect('customer/bookings');
+            return;
+        }
+
+        // Booking must be completed
+        if ($booking['status'] !== 'completed') {
+            $this->flash(
+                'danger',
+                'Review can only be submitted after trip completion.'
+            );
+
+            $this->back();
+            return;
+        }
+
+        // Must use driver
+        if (empty($booking['driver_id'])) {
+            $this->flash(
+                'danger',
+                'This booking does not use a driver.'
+            );
+
+            $this->back();
+            return;
+        }
+
+        // Prevent duplicate review
+        if ($this->driverReviewModel->hasReview((int)$bookingId)) {
+            $this->flash(
+                'danger',
+                'You already submitted a review.'
+            );
+
+            $this->back();
+            return;
+        }
+
+        // =========================================================
+        // Validate input
+        // =========================================================
+
+        $rating = (int)$this->input('rating');
+        $comment = trim($this->input('comment'));
+
+        if ($rating < 1 || $rating > 5) {
+            $this->flash(
+                'danger',
+                'Rating must be between 1 and 5.'
+            );
+
+            $this->back();
+            return;
+        }
+
+        // =========================================================
+        // Save review
+        // =========================================================
+
+        $this->driverReviewModel->createReview([
+            'driver_id' => $booking['driver_id'],
+            'user_id'   => $user['id'],
+            'booking_id'=> $bookingId,
+            'rating'    => $rating,
+            'comment'   => $comment,
+        ]);
+
+        $this->flash(
+            'success',
+            'Thank you for reviewing your driver!'
+        );
+
+        $this->redirect("customer/bookings/$bookingId");
     }
 }

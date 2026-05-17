@@ -87,6 +87,40 @@ class Booking extends Model
         );
     }
 
+    public function getRecentActivities(int $userId, int $limit = 5): array
+    {
+        return $this->query(
+            "SELECT
+                b.booking_code,
+                b.pickup_date,
+                b.return_date,
+                b.status,
+                b.total_price,
+                b.created_at,
+
+                c.brand,
+                c.model,
+                c.category,
+
+                d.full_name AS driver_name
+
+            FROM {$this->table} b
+
+            JOIN cars c
+                ON c.id = b.car_id
+
+            LEFT JOIN drivers d
+                ON d.id = b.driver_id
+
+            WHERE b.user_id = ?
+
+            ORDER BY b.created_at DESC
+
+            LIMIT {$limit}",
+            [$userId]
+        );
+    }
+
     // ----------------------------------------------------------------
     // Get full booking detail
     // ----------------------------------------------------------------
@@ -234,13 +268,41 @@ class Booking extends Model
                 MONTH(created_at) AS month,
                 SUM(total_price) AS revenue
 
-             FROM {$this->table}
+            FROM {$this->table}
 
-             WHERE status = 'completed'
-             AND YEAR(created_at) = ?
+            WHERE status = 'completed'
+            AND YEAR(created_at) = ?
 
-             GROUP BY MONTH(created_at)",
+            GROUP BY MONTH(created_at)",
             [$year]
+        );
+    }
+
+    public function getRecentBookings(int $limit = 10): array
+    {
+        return $this->query(
+            "SELECT
+                b.booking_code,
+                b.total_price,
+                b.status,
+                b.created_at,
+
+                u.full_name AS customer_name,
+
+                c.brand AS car_brand,
+                c.model AS car_model
+
+            FROM {$this->table} b
+
+            JOIN users u
+                ON u.id = b.user_id
+
+            JOIN cars c
+                ON c.id = b.car_id
+
+            ORDER BY b.created_at DESC
+
+            LIMIT {$limit}"
         );
     }
 

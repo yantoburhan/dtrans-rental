@@ -52,10 +52,64 @@ class AdminTourismController extends Controller
         }
 
         try {
-            $this->tourismModel->insert($data);
-            $this->flash('success', 'Tourism destination created successfully.');
+
+            $destinationId = $this->tourismModel->insert($data);
+
+            // =========================
+            // Upload Photos
+            // =========================
+
+            if (!empty($_FILES['photos']['name'][0])) {
+
+                $uploadDir = 'public/uploads/tourism/';
+
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0777, true);
+                }
+
+                foreach ($_FILES['photos']['tmp_name'] as $index => $tmpName) {
+
+                    if ($_FILES['photos']['error'][$index] !== UPLOAD_ERR_OK) {
+                        continue;
+                    }
+
+                    $originalName = $_FILES['photos']['name'][$index];
+                    $extension = strtolower(
+                        pathinfo($originalName, PATHINFO_EXTENSION)
+                    );
+
+                    $allowed = ['jpg', 'jpeg', 'png', 'webp'];
+
+                    if (!in_array($extension, $allowed)) {
+                        continue;
+                    }
+
+                    $fileName = uniqid('tourism_') . '.' . $extension;
+
+                    $destinationPath = $uploadDir . $fileName;
+
+                    if (move_uploaded_file($tmpName, $destinationPath)) {
+
+                        $this->tourismModel->addPhoto(
+                            $destinationId,
+                            $destinationPath,
+                            $index
+                        );
+                    }
+                }
+            }
+
+            $this->flash(
+                'success',
+                'Tourism destination created successfully.'
+            );
+
         } catch (Exception $e) {
-            $this->flash('danger', 'Failed to create destination: ' . $e->getMessage());
+
+            $this->flash(
+                'danger',
+                'Failed to create destination: ' . $e->getMessage()
+            );
         }
 
         $this->redirect('admin/tourism');
@@ -63,7 +117,7 @@ class AdminTourismController extends Controller
 
     public function edit(int $id): void
     {
-        $destination = $this->tourismModel->find($id);
+        $destination = $this->tourismModel->getWithPhotos($id);
         if (!$destination) {
             $this->flash('danger', 'Destination not found.');
             $this->redirect('admin/tourism');
@@ -139,6 +193,20 @@ class AdminTourismController extends Controller
         }
 
         try {
+            $destination = $this->tourismModel->getWithPhotos($id);
+
+            if (!empty($destination['photos'])) {
+
+                foreach ($destination['photos'] as $photo) {
+
+                    if (
+                        !empty($photo['photo_path']) &&
+                        file_exists($photo['photo_path'])
+                    ) {
+                        unlink($photo['photo_path']);
+                    }
+                }
+            }
             $this->tourismModel->delete($id);
             $this->flash('success', 'Tourism destination deleted successfully.');
         } catch (Exception $e) {

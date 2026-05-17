@@ -3,11 +3,18 @@
 class CustomerController extends Controller
 {
     public function dashboard(): void
-    {
-        $this->view('customer/dashboard', [
-            'pageTitle' => 'Customer Dashboard',
-        ]);
-    }
+{
+    $bookingModel = new Booking();
+
+    $userId = Session::get('user')['id'];
+
+    $recentActivities = $bookingModel->getRecentActivities($userId);
+
+    $this->view('customer/dashboard', [
+        'pageTitle'        => 'Customer Dashboard',
+        'recentActivities' => $recentActivities,
+    ]);
+}
 
     public function profile(): void
     {

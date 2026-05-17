@@ -172,15 +172,29 @@
     </div>
 </div>
 
+<?php
+$chartRevenue = array_fill(0, 12, 0);
+
+foreach (($stats['monthly_revenue'] ?? []) as $row) {
+    $index = ((int)$row['month']) - 1;
+    $chartRevenue[$index] = (float)$row['revenue'];
+}
+?>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+
     const ctx = document.getElementById('revenueChart').getContext('2d');
-    const monthlyRevenue = <?= json_encode($stats['monthly_revenue'] ?? []) ?>;
+
+    const monthlyRevenue = <?= json_encode($chartRevenue) ?>;
 
     new Chart(ctx, {
         type: 'line',
         data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            labels: [
+                'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+            ],
             datasets: [{
                 label: 'Revenue (IDR)',
                 data: monthlyRevenue,
@@ -202,6 +216,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+
 });
 </script>
 

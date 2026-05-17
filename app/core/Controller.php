@@ -89,16 +89,40 @@ abstract class Controller
                strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
     }
 
+    protected function timeAgo(string $datetime): string
+    {
+        $time = time() - strtotime($datetime);
+
+        if ($time < 60) {
+            return 'Just now';
+        }
+
+        if ($time < 3600) {
+            return floor($time / 60) . ' minutes ago';
+        }
+
+        if ($time < 86400) {
+            return floor($time / 3600) . ' hours ago';
+        }
+
+        if ($time < 604800) {
+            return floor($time / 86400) . ' days ago';
+        }
+
+        return date('d M Y', strtotime($datetime));
+    }
+
     // ----------------------------------------------------------------
     // CSRF
     // ----------------------------------------------------------------
 
     protected function generateCsrf(): string
     {
-        if (!Session::has('_csrf_token')) {
-            Session::set('_csrf_token', bin2hex(random_bytes(32)));
+        if (empty($_SESSION['_csrf_token'])) {
+            $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
         }
-        return Session::get('_csrf_token');
+
+        return $_SESSION['_csrf_token'];
     }
 
     protected function validateCsrf(string $token = ''): bool

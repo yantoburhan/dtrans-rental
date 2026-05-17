@@ -69,7 +69,7 @@ $router->group(['prefix' => '/customer', 'middleware' => ['auth']], function ($r
     $r->get('/bookings/{id}/invoice',    'InvoiceController@download');
 
     // Driver rating
-    $r->post('/drivers/{id}/review',     'ReviewController@store');
+    $r->post('/bookings/{id}/review',    'BookingController@submitReview');
 
     // Live chat
     $r->get('/chat',                     'ChatController@index');
